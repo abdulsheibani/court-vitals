@@ -1,0 +1,31 @@
+# Environments & dependencies
+.env
+.venv/
+venv/
+node_modules/
+__pycache__/
+*.pyc
+
+# Database
+*.db
+*.sqlite3
+
+# Build artifacts
+/frontend/build/
+/frontend/.next/
+dist/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/
+
+# Claude / AI tooling artifacts (explicitly excluded from public repo)
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+
+# Private planning & strategy docs — kept out of the public repo to protect
+# the differentiating ideas behind the project
+/planning/
+*.private.md
