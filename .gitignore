@@ -14,6 +14,7 @@ __pycache__/
 /frontend/build/
 /frontend/.next/
 dist/
+*.egg-info/
 
 # OS/editor
 .DS_Store
