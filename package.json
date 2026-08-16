@@ -1,0 +1,13 @@
+{
+  "name": "court-vitals-dev",
+  "private": true,
+  "description": "Root-level dev orchestration only. Frontend app lives in /frontend, Python deps in pyproject.toml.",
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c blue,green \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": ".\\.venv\\Scripts\\python.exe -m uvicorn api.main:app --reload --port 8000",
+    "dev:web": "npm --prefix frontend run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
