@@ -12,12 +12,20 @@ class TeamOut(BaseModel):
     conference: str
     division: str
     logo_url: str
+    primary_color: str
 
 
 class TeamDetailOut(TeamOut):
     current_elo_rating: float | None = None
     playoff_prob: float | None = None
     avg_wins: float | None = None
+
+
+class TrajectoryOut(BaseModel):
+    actual: list[int]
+    simulated: list[list[int]]
+    final_actual_wins: int
+    games_played: int
 
 
 class PlayerOut(BaseModel):

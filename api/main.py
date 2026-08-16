@@ -4,8 +4,16 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session as SessionType
 
 from api.dependencies import get_db
-from api.schemas import PlayerOut, RatingPointOut, SimulationSnapshotOut, TeamDetailOut, TeamOut
+from api.schemas import (
+    PlayerOut,
+    RatingPointOut,
+    SimulationSnapshotOut,
+    TeamDetailOut,
+    TeamOut,
+    TrajectoryOut,
+)
 from ingestion.models import Player, RatingHistory, SimulationSnapshot, Team
+from ratings.trajectory import compute_trajectory
 
 app = FastAPI(title="Court Vitals API")
 
@@ -68,6 +76,14 @@ def get_team_ratings(team_id: int, db: SessionType = Depends(get_db)):
         .where(RatingHistory.team_id == team_id)
         .order_by(RatingHistory.date)
     ).all()
+
+
+@app.get("/teams/{team_id}/trajectory", response_model=TrajectoryOut)
+def get_team_trajectory(team_id: int, db: SessionType = Depends(get_db)):
+    team = db.get(Team, team_id)
+    if team is None:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return compute_trajectory(db, team_id)
 
 
 @app.get("/players", response_model=list[PlayerOut])

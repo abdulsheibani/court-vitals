@@ -17,6 +17,7 @@ class Team(Base):
     conference: Mapped[str] = mapped_column(String(10))
     division: Mapped[str] = mapped_column(String(20))
     logo_url: Mapped[str] = mapped_column(String(255))
+    primary_color: Mapped[str] = mapped_column(String(7))
 
 
 class Player(Base):
