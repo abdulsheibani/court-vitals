@@ -18,6 +18,32 @@ def fetch_season_rows(season_type: str):
     return finder.get_data_frames()[0].to_dict(orient="records")
 
 
+def _parse_home_away(team_rows: list[dict]) -> tuple[dict, dict] | None:
+    """
+    Determine which of the two rows for a game is home and which is away.
+
+    Normally one row's MATCHUP contains "vs." (home) and the other "@" (away).
+    But a handful of games come back from the API with BOTH rows carrying the
+    same MATCHUP string (e.g. both say "NYK @ ORL" even on ORL's own row).
+    The string's content is still correct either way -- "A @ B" always means
+    A is away and B is home -- so instead of trusting which row it came from,
+    parse the abbreviations out of it and match them to each row by TEAM_ID.
+    """
+    matchup = team_rows[0]["MATCHUP"]
+    if " vs. " in matchup:
+        home_abbr, away_abbr = matchup.split(" vs. ")
+    elif " @ " in matchup:
+        away_abbr, home_abbr = matchup.split(" @ ")
+    else:
+        return None
+
+    by_abbr = {r["TEAM_ABBREVIATION"]: r for r in team_rows}
+    if home_abbr not in by_abbr or away_abbr not in by_abbr:
+        return None
+
+    return by_abbr[home_abbr], by_abbr[away_abbr]
+
+
 def ingest_games() -> None:
     rows = fetch_season_rows("Regular Season") + [
         {**row, "IS_PLAYOFF": True} for row in fetch_season_rows("Playoffs")
@@ -36,11 +62,11 @@ def ingest_games() -> None:
                 skipped += 1
                 continue
 
-            home_row = next((r for r in team_rows if "vs." in r["MATCHUP"]), None)
-            away_row = next((r for r in team_rows if "@" in r["MATCHUP"]), None)
-            if home_row is None or away_row is None:
+            parsed = _parse_home_away(team_rows)
+            if parsed is None:
                 skipped += 1
                 continue
+            home_row, away_row = parsed
 
             game = Game(
                 game_id=int(game_id),
