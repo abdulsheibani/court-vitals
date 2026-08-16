@@ -41,6 +41,39 @@ class Game(Base):
     home_score: Mapped[int | None] = mapped_column(nullable=True)
     away_score: Mapped[int | None] = mapped_column(nullable=True)
     is_playoff: Mapped[bool] = mapped_column(default=False)
+    # The margin of victory Elo should actually use, per Cleaning the
+    # Glass's garbage-time methodology (ratings/garbage_time.py). Null means
+    # "no garbage time detected -- use the raw final margin." Set only when
+    # the score margin at the moment garbage time began was smaller than the
+    # final margin.
+    credited_margin: Mapped[int | None] = mapped_column(nullable=True)
+
+
+class BoxScore(Base):
+    __tablename__ = "box_scores"
+
+    # Composite primary key: one row per player per game.
+    game_id: Mapped[int] = mapped_column(ForeignKey("games.game_id"), primary_key=True)
+    player_id: Mapped[int] = mapped_column(ForeignKey("players.player_id"), primary_key=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.team_id"))
+    minutes: Mapped[float]
+    points: Mapped[int]
+    rebounds: Mapped[int]
+    assists: Mapped[int]
+    steals: Mapped[int]
+    blocks: Mapped[int]
+    turnovers: Mapped[int]
+    personal_fouls: Mapped[int]
+    field_goals_made: Mapped[int]
+    field_goals_attempted: Mapped[int]
+    three_pointers_made: Mapped[int]
+    three_pointers_attempted: Mapped[int]
+    free_throws_made: Mapped[int]
+    free_throws_attempted: Mapped[int]
+    plus_minus: Mapped[float | None] = mapped_column(nullable=True)
+    # Set by the garbage-time detection pass (ratings v2), not at ingestion
+    # time -- defaults to False until that pass runs.
+    is_garbage_time: Mapped[bool] = mapped_column(default=False)
 
 
 class RatingHistory(Base):

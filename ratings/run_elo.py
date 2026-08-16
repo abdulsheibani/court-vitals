@@ -31,6 +31,7 @@ def run_elo() -> None:
                 away_score=game.away_score,
                 home_is_back_to_back=home_is_b2b,
                 away_is_back_to_back=away_is_b2b,
+                credited_margin=game.credited_margin,
             )
             ratings[game.home_team_id] = new_home
             ratings[game.away_team_id] = new_away

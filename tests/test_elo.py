@@ -91,3 +91,36 @@ def test_back_to_back_penalty_increases_upset_credit():
         home_is_back_to_back=True,
     )
     assert (tired_new_home - 1500) > (fresh_new_home - 1500)
+
+
+def test_credited_margin_overrides_point_diff_for_multiplier():
+    # A 30-point final margin, but garbage time means only 10 points should
+    # actually count -- the rating change should match a real 10-point game,
+    # not a 30-point blowout.
+    _, adjusted_loser = update_ratings(
+        home_rating=1500, away_rating=1500, home_score=130, away_score=100, credited_margin=10
+    )
+    _, real_10pt_loser = update_ratings(
+        home_rating=1500, away_rating=1500, home_score=110, away_score=100
+    )
+    assert adjusted_loser == pytest.approx(real_10pt_loser)
+
+
+def test_credited_margin_does_not_change_who_won():
+    # Even with a tiny credited margin, the actual result (home won) must
+    # still be respected -- garbage time affects MOV credit, not the outcome.
+    new_home, new_away = update_ratings(
+        home_rating=1500, away_rating=1500, home_score=130, away_score=100, credited_margin=2
+    )
+    assert new_home > 1500
+    assert new_away < 1500
+
+
+def test_credited_margin_none_falls_back_to_real_margin():
+    with_none = update_ratings(
+        home_rating=1500, away_rating=1500, home_score=110, away_score=100, credited_margin=None
+    )
+    without_param = update_ratings(
+        home_rating=1500, away_rating=1500, home_score=110, away_score=100
+    )
+    assert with_none == without_param
