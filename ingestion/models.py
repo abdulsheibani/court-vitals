@@ -1,6 +1,6 @@
 import datetime as dt
 
-from sqlalchemy import Date, ForeignKey, String
+from sqlalchemy import JSON, Date, ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -50,3 +50,16 @@ class RatingHistory(Base):
     team_id: Mapped[int] = mapped_column(ForeignKey("teams.team_id"), primary_key=True)
     date: Mapped[dt.date] = mapped_column(Date, primary_key=True)
     elo_rating: Mapped[float]
+
+
+class SimulationSnapshot(Base):
+    __tablename__ = "simulation_snapshots"
+
+    # One row per team per simulation run — a nightly job re-runs the full
+    # 10,000-trial simulation and inserts a fresh set of rows dated today,
+    # which is what lets the momentum chart (2.11) show odds moving over time.
+    run_date: Mapped[dt.date] = mapped_column(Date, primary_key=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.team_id"), primary_key=True)
+    playoff_prob: Mapped[float]
+    avg_wins: Mapped[float]
+    seed_distribution_json: Mapped[dict] = mapped_column(JSON)
