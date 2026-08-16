@@ -26,7 +26,12 @@ dist/
 CLAUDE.md
 **/CLAUDE.md
 
-# Private planning & strategy docs — kept out of the public repo to protect
+# Private planning & strategy docs, kept out of the public repo to protect
 # the differentiating ideas behind the project
 /planning/
 *.private.md
+
+# Raw external datasets: large, easily re-downloaded from their documented
+# source, not worth bloating the repo with. See injury_risk/data/README.md
+# for source/license/download instructions.
+/injury_risk/data/raw/
